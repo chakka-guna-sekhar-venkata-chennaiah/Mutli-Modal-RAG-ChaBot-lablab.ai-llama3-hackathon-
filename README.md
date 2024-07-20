@@ -116,7 +116,7 @@ For Quick Demo, Watch 👀
 
 [Quick Demo](https://github.com/chakka-guna-sekhar-venkata-chennaiah/Mutli-Modal-RAG-ChaBot/assets/110555361/60ff76f6-b9f5-42e8-87e9-fc5a66e6dc34)
 
-[Live WebApp Prototype](https://mutli-modal-rag-chabot.streamlit.app/)
+[Live WebApp Prototype](https://mutli-modal-rag-chabot-lablabai-llama3-hackathon.streamlit.app/)
 
 
 # 5. Future Enhancements
