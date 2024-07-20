@@ -105,10 +105,13 @@ As mentioned earlier, this repository is built using the [Monuments of National 
 Our ultimate goal is to develop a Personalized Knowledge Model (PKM) and a dynamic multi-modal RAG system. This repository serves as a gateway to achieving that vision, and we welcome your support and contributions to help make it a reality.
 
 # 4. Demo (Detailed Explanation)
-https://github.com/user-attachments/assets/fe697c20-5f04-4ba7-a645-d69d0a71582d
 
 
 [Live WebApp Prototype](https://mutli-modal-rag-chabot-lablabai-llama3-hackathon.streamlit.app/)
+
+
+https://github.com/user-attachments/assets/9ccbd631-61b6-4b46-b725-2e9877c20fbc
+
 
 
 # 5. Future Enhancements
