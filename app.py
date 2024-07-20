@@ -92,7 +92,7 @@ if page=='About':
 elif page=='Demo':
     st.markdown("""
                 <h1 align='center'>
-                📹 Check out the demo video below. 👇</h1>
+                📹 Check out the demo video below 👇</h1>
                 """,unsafe_allow_html=True)
     st.video("demo/demo.mp4")
 elif page=='MMR-PDF':
