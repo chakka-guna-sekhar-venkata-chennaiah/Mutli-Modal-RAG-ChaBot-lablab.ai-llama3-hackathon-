@@ -124,27 +124,48 @@ elif page=='MMR-PDF':
 
     if st.button("Submit"):
         
-        with st.chat_message("user"):
-            st.markdown(user_input)
+        col1,col2=st.columns(2)
 
-        # Get the answer
-        result, relevant_images = answer(user_input)
+        with col1:
+            st.success('Normal RAG')
+            with st.chat_message("user"):
+                st.markdown(user_input)
 
-        # Show the answer
-        with st.chat_message("assistant"):
-        
-            with st.spinner('🖊️ 🖊️ 🖊️...'):
-                time.sleep(2)
+            # Get the answer
+            result, relevant_images = answer(user_input)
 
-        st.markdown(result)
+            # Show the answer
+            with st.chat_message("assistant"):
+            
+                with st.spinner('🖊️ 🖊️ 🖊️...'):
+                    time.sleep(2)
 
-        if len(relevant_images)>0:
-            # Display a success message
-            st.success('Relevant Image Found....')
-            with st.spinner('📷 📷 📷...'):
-                time.sleep(2)
-            img_bytes = base64.b64decode(relevant_images[0])
-            st.image(img_bytes)
+            st.markdown(result)
+
+            
+        with col2:
+            st.success('Multi Modal RAG')
+            with st.chat_message("user"):
+                st.markdown(user_input)
+
+            # Get the answer
+            result, relevant_images = answer(user_input)
+
+            # Show the answer
+            with st.chat_message("assistant"):
+            
+                with st.spinner('🖊️ 🖊️ 🖊️...'):
+                    time.sleep(2)
+
+            st.markdown(result)
+
+            if len(relevant_images)>0:
+                # Display a success message
+                st.success('Relevant Frame Found....')
+                with st.spinner('📷 📷 📷...'):
+                    time.sleep(2)
+                img_bytes = base64.b64decode(relevant_images[0])
+                st.image(img_bytes)
 
 else:
     with st.sidebar:
