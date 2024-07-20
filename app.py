@@ -9,7 +9,7 @@ st.set_page_config(layout="wide",initial_sidebar_state="expanded",
 
 
 
-page = st.sidebar.selectbox("Jump to... 👇", ["About", "MMR-PDF",'MMR-Video'])
+page = st.sidebar.selectbox("Jump to... 👇", ["About", "Demo","MMR-PDF",'MMR-Video'])
 
 
 if page=='About':
@@ -86,7 +86,11 @@ if page=='About':
     st.markdown(glowing_text_style, unsafe_allow_html=True)
     st.markdown(f'<p class="glowing-text"> 🤖 Multi-Modal RAG WebApp 🤖</p>', unsafe_allow_html=True)
     st.image('multimodal.png')
+    st.success("📣 I highly suggest 💡 you check out the 'demo' subpage 🌐 for a more comprehensive understanding 🧠 of the app and how to use it 📱. It's really helpful! 👍")
     
+
+elif page=='Demo':
+    st.video("demo/demo.mp4")
 elif page=='MMR-PDF':
     with st.sidebar:
         st.write("[Monuments-of-National-Importance PDF](https://eacpm.gov.in/wp-content/uploads/2023/01/Monuments-of-National-Importance.pdf)")
