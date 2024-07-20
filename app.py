@@ -90,6 +90,7 @@ if page=='About':
     
 
 elif page=='Demo':
+    st.write("📹 Check out the demo video below. 👇")
     st.video("demo/demo.mp4")
 elif page=='MMR-PDF':
     with st.sidebar:
