@@ -110,7 +110,11 @@ Our ultimate goal is to develop a Personalized Knowledge Model (PKM) and a dynam
 [Live WebApp Prototype](https://mutli-modal-rag-chabot-lablabai-llama3-hackathon.streamlit.app/)
 
 
-https://github.com/user-attachments/assets/9ccbd631-61b6-4b46-b725-2e9877c20fbc
+
+
+https://github.com/user-attachments/assets/cbc52104-0cd4-4713-b88f-5c88647ec291
+
+
 
 
 
