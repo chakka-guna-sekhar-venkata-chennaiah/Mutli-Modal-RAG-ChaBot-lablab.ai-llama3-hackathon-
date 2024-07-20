@@ -184,6 +184,7 @@ else:
         col1,col2=st.columns(2)
 
         with col1:
+            st.success('Normal RAG')
             with st.chat_message("user"):
                 st.markdown(user_input)
 
@@ -200,6 +201,7 @@ else:
 
             
         with col2:
+            st.success('Multi Modal RAG')
             with st.chat_message("user"):
                 st.markdown(user_input)
 
