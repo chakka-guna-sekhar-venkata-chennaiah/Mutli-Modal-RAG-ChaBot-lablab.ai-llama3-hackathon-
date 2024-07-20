@@ -90,7 +90,10 @@ if page=='About':
     
 
 elif page=='Demo':
-    st.write("📹 Check out the demo video below. 👇")
+    st.markdown("""
+                <p align='center'>
+                📹 Check out the demo video below. 👇"
+                """,unsafe_allow_html=True)
     st.video("demo/demo.mp4")
 elif page=='MMR-PDF':
     with st.sidebar:
