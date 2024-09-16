@@ -40,7 +40,7 @@ class MDBChatLLM(LLM):
 
     def _call(self, prompt, **kwargs):
         completion = self.client.chat.completions.create(
-            model="llama-3-70b-8912",
+            model="gpt-3.5-turbo",
             messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
             stream=False
         )
