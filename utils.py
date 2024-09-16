@@ -1,10 +1,12 @@
 from openai import OpenAI
-from langchain_community.vectorstores import FAISS  # Updated import
+from langchain.vectorstores import FAISS
+from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.embeddings.base import Embeddings
 from langchain.llms.base import LLM
 from pydantic import BaseModel, Field
 import streamlit as st
+
 
 client = OpenAI(
     api_key=st.secrets['api_key'],
@@ -30,38 +32,32 @@ class MDBEmbeddings(Embeddings):
     def embed_documents(self, texts):
         return [self.embed_query(text) for text in texts]
 
-# Define the LLM response function using Groq
-def get_llm_response(prompt):
-    response = client.chat.completions.create(
-        model="llama3-70b-8192",
-        messages=[
-            {"role": "user", "content": prompt}
-        ]
-    )
-    return response.choices[0].message.content
+class MDBChatLLM(LLM):
+    client: OpenAI = Field(...)
 
+    def __init__(self, client):
+        super().__init__()
+        self.client = client
+
+    def _call(self, prompt, **kwargs):
+        completion = self.client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
+            stream=False
+        )
+        return completion.choices[0].message.content
+
+    @property
+    def _llm_type(self) -> str:
+        return "custom_mdb_chat"
 
 # Instantiate the embeddings and LLM classes
 embeddings = MDBEmbeddings(client=client)
-
+mdb_chat_llm = MDBChatLLM(client=client)
 
 # Load the FAISS index with custom embeddings
 db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 db1 = FAISS.load_local("faiss_index_audio", embeddings, allow_dangerous_deserialization=True)
-
-# Create a wrapper class for the Groq LLM
-class GroqLLM(LLM):
-    def __init__(self, client):
-        self.client = client
-
-    def _call(self, prompt, **kwargs):
-        return self.client.chat.completions.create(
-            model="llama3-70b-8192",
-            messages=[{"role": "user", "content": prompt}]
-        ).choices[0].message.content
-
-# Instantiate the Groq LLM
-groq_llm = GroqLLM(client)
 
 # Define the prompt template for the LLMChain
 prompt_template = """
@@ -76,7 +72,7 @@ Answer:
 """
 
 # Setup the LLMChain with the custom chat model
-qa_chain = LLMChain(llm=groq_llm, prompt=PromptTemplate.from_template(prompt_template))
+qa_chain = LLMChain(llm=mdb_chat_llm, prompt=PromptTemplate.from_template(prompt_template))
 
 # Define the answer function to handle queries
 def answer(question):
