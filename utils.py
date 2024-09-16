@@ -1,5 +1,6 @@
 from openai import OpenAI
-from langchain.vectorstores import FAISS
+from langchain_community.vectorstores import FAISS  # Updated import
+from langchain_core.llms.base import LLM  # Import the base LLM class
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.embeddings.base import Embeddings
@@ -50,6 +51,20 @@ embeddings = MDBEmbeddings(client=client)
 db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
 db1 = FAISS.load_local("faiss_index_audio", embeddings, allow_dangerous_deserialization=True)
 
+# Create a wrapper class for the Groq LLM
+class GroqLLM(LLM):
+    def __init__(self, client):
+        self.client = client
+
+    def _call(self, prompt, **kwargs):
+        return self.client.chat.completions.create(
+            model="llama3-70b-8192",
+            messages=[{"role": "user", "content": prompt}]
+        ).choices[0].message.content
+
+# Instantiate the Groq LLM
+groq_llm = GroqLLM(client)
+
 # Define the prompt template for the LLMChain
 prompt_template = """
 You are an assistant tasked with summarizing tables and text.
@@ -63,7 +78,7 @@ Answer:
 """
 
 # Setup the LLMChain with the custom chat model
-qa_chain = LLMChain(llm=get_llm_response, prompt=PromptTemplate.from_template(prompt_template))
+qa_chain = LLMChain(llm=groq_llm, prompt=PromptTemplate.from_template(prompt_template))
 
 # Define the answer function to handle queries
 def answer(question):
