@@ -7,48 +7,43 @@ from langchain.llms.base import LLM
 from pydantic import BaseModel, Field
 import streamlit as st
 
+# Update the client for Groq
 client = OpenAI(
-    api_key=st.secrets['api_key'],
-    base_url="https://llm.mdb.ai/"
+    base_url='https://api.groq.com/openai/v1',
+    api_key=st.secrets['key']
 )
 
-class MDBEmbeddings(Embeddings):
-    def __init__(self, client):
-        super().__init__()
-        self.client = client
+# Define the embedding function
+def embed_query(text):
+    response = client.embeddings.create(
+        input=text,
+        model="text-embedding-3-small"
+    )
+    return response.data[0].embedding
 
-    def embed_query(self, text):
-        response = self.client.embeddings.create(
-            model="text-embedding-ada-002",
-            input=text,
-            encoding_format="float"
-        )
-        return response.data[0].embedding
-
-    def __call__(self, text):
-        return self.embed_query(text)
-
-    def embed_documents(self, texts):
-        return [self.embed_query(text) for text in texts]
-
-class MDBChatLLM(LLM):
-    client: OpenAI = Field(...)
-
-    def __init__(self, client):
-        super().__init__()
-        self.client = client
-
-    def _call(self, prompt, **kwargs):
-        completion = self.client.chat.completions.create(
-            model="llama-3-70b",
-            messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
-            stream=False
-        )
-        return completion.choices[0].message.content
-
-    @property
-    def _llm_type(self) -> str:
-        return "custom_mdb_chat"
+# Update the LLM call in the answer function
+def answer(question):
+    relevant_docs = db.similarity_search(question)
+    context = ""
+    relevant_images = []
+    for d in relevant_docs:
+        if d.metadata['type'] == 'text':
+            context += '[text]' + d.metadata['original_content']
+        elif d.metadata['type'] == 'table':
+            context += '[table]' + d.metadata['original_content']
+        elif d.metadata['type'] == 'image':
+            context += '[image]' + d.page_content
+            relevant_images.append(d.metadata['original_content'])
+    
+    # Call the LLM using Groq
+    response = client.chat.completions.create(
+        model="llama3-70b-8192",
+        messages=[
+            {"role": "user", "content": f"Context: {context}\nQuestion: {question}"}
+        ]
+    )
+    result = response.choices[0].message.content
+    return result, relevant_images
 
 # Instantiate the embeddings and LLM classes
 embeddings = MDBEmbeddings(client=client)
@@ -74,23 +69,6 @@ Answer:
 qa_chain = LLMChain(llm=mdb_chat_llm, prompt=PromptTemplate.from_template(prompt_template))
 
 # Define the answer function to handle queries
-def answer(question):
-    relevant_docs = db.similarity_search(question)
-    context = ""
-    relevant_images = []
-    for d in relevant_docs:
-        if d.metadata['type'] == 'text':
-            context += '[text]' + d.metadata['original_content']
-        elif d.metadata['type'] == 'table':
-            context += '[table]' + d.metadata['original_content']
-        elif d.metadata['type'] == 'image':
-            context += '[image]' + d.page_content
-            relevant_images.append(d.metadata['original_content'])
-    result = qa_chain.run({'context': context, 'question': question})
-    return result, relevant_images
-
-
-# Query the vectorstore
 def answer1(question):
     relevant_docs = db1.similarity_search(question)
     context = ""
