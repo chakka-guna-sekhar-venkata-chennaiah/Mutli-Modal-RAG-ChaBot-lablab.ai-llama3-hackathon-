@@ -10,7 +10,7 @@ import streamlit as st
 # Update the client for Groq
 client = OpenAI(
     base_url='https://api.groq.com/openai/v1',
-    api_key=st.secrets['key']
+    api_key=st.secrets['api_key']
 )
 
 # Define the embedding function
