@@ -1,7 +1,5 @@
 from openai import OpenAI
 from langchain_community.vectorstores import FAISS  # Updated import
-from langchain_core.llms.base import LLM  # Import the base LLM class
-from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from langchain.embeddings.base import Embeddings
 from langchain.llms.base import LLM
