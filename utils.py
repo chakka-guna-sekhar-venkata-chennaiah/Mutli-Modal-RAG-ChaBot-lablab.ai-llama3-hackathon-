@@ -45,13 +45,22 @@ def answer(question):
     result = response.choices[0].message.content
     return result, relevant_images
 
-# Instantiate the embeddings and LLM classes
-embeddings = MDBEmbeddings(client=client)
-mdb_chat_llm = MDBChatLLM(client=client)
+# Load the FAISS index with embeddings using the embed_query function
+# Note: You may need to create embeddings for your documents before loading the FAISS index
+# Example: embeddings = [embed_query(doc) for doc in documents]  # Create embeddings for your documents
 
-# Load the FAISS index with custom embeddings
-db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
-db1 = FAISS.load_local("faiss_index_audio", embeddings, allow_dangerous_deserialization=True)
+db = FAISS.load_local("faiss_index", embed_query, allow_dangerous_deserialization=True)
+db1 = FAISS.load_local("faiss_index_audio", embed_query, allow_dangerous_deserialization=True)
+
+# Setup the LLMChain with the Groq LLM function
+def get_llm_response(prompt):
+    response = client.chat.completions.create(
+        model="llama3-70b-8192",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response.choices[0].message.content
 
 # Define the prompt template for the LLMChain
 prompt_template = """
@@ -65,8 +74,8 @@ Just return the helpful answer in as much detail as possible.
 Answer:
 """
 
-# Setup the LLMChain with the custom chat model
-qa_chain = LLMChain(llm=mdb_chat_llm, prompt=PromptTemplate.from_template(prompt_template))
+# Update the qa_chain to use the get_llm_response function
+qa_chain = LLMChain(llm=get_llm_response, prompt=PromptTemplate.from_template(prompt_template))
 
 # Define the answer function to handle queries
 def answer1(question):
