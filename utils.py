@@ -31,28 +31,20 @@ class MDBEmbeddings(Embeddings):
     def embed_documents(self, texts):
         return [self.embed_query(text) for text in texts]
 
-class MDBChatLLM(LLM):
-    client: OpenAI = Field(...)
+# Define the LLM response function using Groq
+def get_llm_response(prompt):
+    response = client.chat.completions.create(
+        model="llama3-70b-8192",
+        messages=[
+            {"role": "user", "content": prompt}
+        ]
+    )
+    return response.choices[0].message.content
 
-    def __init__(self, client):
-        super().__init__()
-        self.client = client
-
-    def _call(self, prompt, **kwargs):
-        completion = self.client.chat.completions.create(
-            model="llama-3-70b",
-            messages=[{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": prompt}],
-            stream=False
-        )
-        return completion.choices[0].message.content
-
-    @property
-    def _llm_type(self) -> str:
-        return "custom_mdb_chat"
 
 # Instantiate the embeddings and LLM classes
 embeddings = MDBEmbeddings(client=client)
-mdb_chat_llm = MDBChatLLM(client=client)
+
 
 # Load the FAISS index with custom embeddings
 db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
@@ -71,7 +63,7 @@ Answer:
 """
 
 # Setup the LLMChain with the custom chat model
-qa_chain = LLMChain(llm=mdb_chat_llm, prompt=PromptTemplate.from_template(prompt_template))
+qa_chain = LLMChain(llm=get_llm_response, prompt=PromptTemplate.from_template(prompt_template))
 
 # Define the answer function to handle queries
 def answer(question):
